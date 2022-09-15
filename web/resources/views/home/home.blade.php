@@ -81,16 +81,14 @@
 						</header>
 						
 						<div class="slideshow-container flex flex-3">
-							<div class="mySlides3 fade">
+						    <div class="g-b-cat tab tab-1 flex flex-3 active">
 							@for ($i = 8; $i < sizeof($g_hot); $i++)
-								<div class="mySlides2 flex flex-3">
 									@component('components.box', [
 											'gc_by_id' => $gc_by_id, 
 											'gi' => $g_hot[$i],
 											'role' => 0
 										])
 									@endcomponent
-								</div>
 							@endfor
 							</div>
 						</div>
@@ -118,21 +116,19 @@
 							<p>{{ trans('message.home.subheader_new') }}</p>
 						</header>
 
-						<div class="flex flex-3 slideshow-container">
-							<div class="mySlides3 fade">
+						<div class="slideshow-container flex flex-3">
+						    <div class="g-b-cat tab tab-1 flex flex-3 active">
 							@for ($i = 0; $i < sizeof($g_new); $i++)
-								<div class="mySlides2 flex flex-3">
 									@component('components.box', [
 											'gc_by_id' => $gc_by_id, 
 											'gi' => $g_new[$i],
 											'role' => 0
 										])
 									@endcomponent
-								</div>
 							@endfor
 							</div>
-							
 						</div>
+						
 					</div>
 					<div class="clear"></div>
 				</section>
