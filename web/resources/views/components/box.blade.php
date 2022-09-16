@@ -6,7 +6,7 @@
 		{!! showVoteStar2($gi->g_vote, $gi->g_vote_time, $gi->g_play_time) !!}
 	@endif
 	<p class="caption">
-		<span class="title">{{ $gi->g_title }}</span>
+		<span class="title">{{ shortenStr($gi->g_title) }}</span>
 	@if ($gi->g_author != '')
 		<span class="small"><br />By: {{ $gi->g_author }}</span>
 	@endif
