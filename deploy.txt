@@ -4,3 +4,6 @@ Deploy to shared host:
 After do above link, update:
 - env
 - config/constants.php
+
+test 1
+test 2
