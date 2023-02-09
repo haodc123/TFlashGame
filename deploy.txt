@@ -1,7 +1,20 @@
 Deploy to shared host:
 - https://viblo.asia/p/deploy-laravel-5-len-shared-hosting-Qbq5Q4qXlD8
 
-Update:
-- after do above link:
+After do above link, update:
 - env
 - config/constants.php
+
+test 1
+test 2
+
+test 3
+test 4
+
+test 5
+test 6
+
+test 7
+test 8
+test 9
+test 10
