@@ -39,11 +39,13 @@ class Game extends Model
         if (isMobile()) {
             return self::whereIn('g_hot', array(1,2))
                     ->where('g_not_mobi', 0)
+                    ->orderBy('g_vote', 'DESC')
                     ->orderBy('g_vote_time', 'DESC')
                     ->take($n)->get();
         }
         return self::whereIn('g_hot', array(1,2))
                     ->orderBy('g_vote', 'DESC')
+                    ->orderBy('g_vote_time', 'DESC')
                     ->take($n)->get();
     }
 
@@ -57,12 +59,16 @@ class Game extends Model
                         $query->orWhere('g_cat_4', '=', $cat);
                     })
                     ->where('g_not_mobi', 0)
+                    ->orderBy('g_vote', 'DESC')
+                    ->orderBy('g_vote_time', 'DESC')
                     ->take($n)->get();
         }
         return self::where('g_cat_1', $cat)
                     ->orWhere('g_cat_2', $cat)
                     ->orWhere('g_cat_3', $cat)
                     ->orWhere('g_cat_4', $cat)
+                    ->orderBy('g_vote', 'DESC')
+                    ->orderBy('g_vote_time', 'DESC')
                     ->take($n)->get();
     }
     public function getGamesByCatIDs($arr_cat, $n=60) {
@@ -78,12 +84,16 @@ class Game extends Model
                         $query->orWhereIn('g_cat_4', $f);
                     })
                     ->where('g_not_mobi', 0)
+                    ->orderBy('g_vote', 'DESC')
+                    ->orderBy('g_vote_time', 'DESC')
                     ->take($n)->get();
         }
         return self::whereIn('g_cat_1', $f)
                     ->orWhereIn('g_cat_2', $f)
                     ->orWhereIn('g_cat_3', $f)
                     ->orWhereIn('g_cat_4', $f)
+                    ->orderBy('g_vote', 'DESC')
+                    ->orderBy('g_vote_time', 'DESC')
                     ->take($n)->get();
     }
     public function getGameBySlug($slug) {
