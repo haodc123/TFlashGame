@@ -2,7 +2,6 @@
 @endcomponent
 			
 
-
 			<section id="g-by-cat-1" class="wrapper style2">
 					<div class="inner">
 						<header class="cat">
@@ -50,6 +49,9 @@
 												])
 											@endcomponent
 										@endfor
+										</div>
+										<div class="paging">
+											@php echo $g->links() @endphp
 										</div>
 								</div>
 								<ul class="tab-list">

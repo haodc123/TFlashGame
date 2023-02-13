@@ -74,7 +74,7 @@ class CatController extends Controller
 		$g = new Game();
 		$gc = new GameCats();
 		$slug = $gc->getCatSlugByID($id);
-		$g_by_cat = $g->getGamesByCatID($id, 18);
+		$g_by_cat = $g->getGamesByCatID_API($id, 18);
 
 		$gc_all = $gc->getArrayCatRichInfo();
         $gc_by_id = $gc_all[0];

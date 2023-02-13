@@ -61,6 +61,28 @@ class Game extends Model
                     ->where('g_not_mobi', 0)
                     ->orderBy('g_vote', 'DESC')
                     ->orderBy('g_vote_time', 'DESC')
+                    ->take($n)->paginate(100);
+        }
+        return self::where('g_cat_1', $cat)
+                    ->orWhere('g_cat_2', $cat)
+                    ->orWhere('g_cat_3', $cat)
+                    ->orWhere('g_cat_4', $cat)
+                    ->orderBy('g_vote', 'DESC')
+                    ->orderBy('g_vote_time', 'DESC')
+                    ->take($n)->paginate(100);
+    }
+    public function getGamesByCatID_API($cat, $n=60) {
+        if (isMobile()) {
+            return self::where(function($query) use ($cat)
+                    {
+                        $query->where('g_cat_1', '=', $cat);
+                        $query->orWhere('g_cat_2', '=', $cat);
+                        $query->orWhere('g_cat_3', '=', $cat);
+                        $query->orWhere('g_cat_4', '=', $cat);
+                    })
+                    ->where('g_not_mobi', 0)
+                    ->orderBy('g_vote', 'DESC')
+                    ->orderBy('g_vote_time', 'DESC')
                     ->take($n)->get();
         }
         return self::where('g_cat_1', $cat)
