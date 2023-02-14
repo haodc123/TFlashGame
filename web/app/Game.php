@@ -14,6 +14,9 @@ class Game extends Model
 
     protected $table = 'game';
 
+    const PER_PAGE = 100;
+    // define('PER_PAGE', 100);
+
     // below is no need because default
     // protected $primaryKey = 'id';
     // public $incrementing = true;
@@ -47,6 +50,19 @@ class Game extends Model
                     ->orderBy('g_vote', 'DESC')
                     ->orderBy('g_vote_time', 'DESC')
                     ->take($n)->get();
+    }
+    public function getHotGamesPaging() {
+        if (isMobile()) {
+            return self::whereIn('g_hot', array(1,2))
+                    ->where('g_not_mobi', 0)
+                    ->orderBy('g_vote', 'DESC')
+                    ->orderBy('g_vote_time', 'DESC')
+                    ->paginate(Game::PER_PAGE);
+        }
+        return self::whereIn('g_hot', array(1,2))
+                    ->orderBy('g_vote', 'DESC')
+                    ->orderBy('g_vote_time', 'DESC')
+                    ->paginate(Game::PER_PAGE);
     }
 
     public function getGamesByCatID($cat, $n=60) {

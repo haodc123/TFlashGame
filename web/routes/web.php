@@ -23,6 +23,7 @@ Route::group(['middleware' => 'lang'], function() {
     Route::get('game/{slug}', 'GameController@game')->name('game');
     Route::get('cat/{slug}', 'CatController@gamesbycat')->name('gamesbycat');
     Route::get('cat', 'CatController@allcat')->name('allcat');
+    Route::get('hot', 'GameController@hot')->name('hot');
     Route::get('tags/{slug}', 'TagsController@gamesbytags')->name('gamesbytags');
     Route::get('api_cat/{id}', 'CatController@api_gamesbycat')->name('api_gamesbycat');
     Route::post('api_vote', 'GameController@vote_game')->name('api_vote');

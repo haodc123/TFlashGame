@@ -35,12 +35,12 @@
 						<ul class="manage_game">
 							<li><input placeholder="Vote" type="text" name="m_vote" /></li>
 							<li><input placeholder="Vote_time" type="text" name="m_vote_time" /></li>
-							<li><input placeholder="Play_time" type="text" name="m_play_time" /></li>
+							<!-- <li><input placeholder="Play_time" type="text" name="m_play_time" /></li> -->
 							<li><input placeholder="Hot" type="text" name="m_hot" /></li>
-							<li><input placeholder="Cat 1" type="text" name="m_cat1" /></li>
+							<!-- <li><input placeholder="Cat 1" type="text" name="m_cat1" /></li>
 							<li><input placeholder="Cat 2" type="text" name="m_cat2" /></li>
 							<li><input placeholder="Desc" type="text" name="m_desc" /></li>
-							<li><input placeholder="Guide" type="text" name="m_guide" /></li>
+							<li><input placeholder="Guide" type="text" name="m_guide" /></li> -->
 							<li><input placeholder="Not mobi" type="text" name="m_not_mobi" /></li>
 							<li><input placeholder="Orentation" type="text" name="m_orentation" /></li>
 							<li><input placeholder="Delete" type="text" name="m_delete" /></li>

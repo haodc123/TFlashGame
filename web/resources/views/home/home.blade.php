@@ -64,7 +64,7 @@
 			
 			<!-- Main -->
 			<div id="main">
-					<section id="hot" class="wrapper ">
+				<section id="hot" class="wrapper ">
 					<div class="inner">
 						<div class="wrap_search">
 							<form method="post" action="{{ route('search')}}">
@@ -92,7 +92,7 @@
 							@endfor
 							</div>
 						</div>
-						
+						<a href="hot/" class="link-more">See more</a>
 					</div>
 					<div class="clear"></div>
 				</section>

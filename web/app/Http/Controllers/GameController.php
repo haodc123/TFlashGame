@@ -48,6 +48,29 @@ class GameController extends Controller
                 'arr_tags' => array_unique($arr_tags)
             ]);
         }
+    }
+    
+    public function hot() {
+
+		$g = new Game();
+		$gc = new GameCats();
+		$g_hot = $g->getHotGamesPaging();
+		
+		$gc_all = $gc->getArrayCatRichInfo();
+        $gc_by_id = $gc_all[0];
+        $arr_tags = $gc_all[1];
+            
+        $user = \Auth::user();
+        $role = -1; // no user logged in
+        if (isset($user))
+            $role = $user->role;
+
+        return view('hot.hot', [
+            'role' => $role,
+			'g_hot' => $g_hot, 
+			'gc_by_id' => $gc_by_id, // array all cat by id: (id => (name, slug)),...
+            'arr_tags' => array_unique($arr_tags)
+        ]);
 	}
 
     public function manage_game(Request $request) {

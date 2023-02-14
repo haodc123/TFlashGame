@@ -4106,6 +4106,7 @@ ul.manage_game li {
 }
 
 .link-more {
+	display: block;
 	width: 100%;
 	text-align: right;
 	padding-right: 80px;
