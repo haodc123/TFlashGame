@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 jobs:
   build_and_test:
@@ -21,6 +21,15 @@ jobs:
           key: vendor-v1-{{ checksum "composer.lock" }}
           paths:
             - vendor
-
       # run test
       - run: phpcs --standard=Framgia app
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build_and_test:
+          context:
+            - docker-hub-pull-creds
+          filters:
+            branches:
+              only: /develop|staging|master/
