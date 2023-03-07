@@ -1,0 +1,11 @@
+FROM nginx:stable-alpine
+
+ENV TZ Asia/Singapore
+
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+
+RUN rm /etc/nginx/conf.d/default.conf
+
+STOPSIGNAL SIGQUIT
+
+CMD ["nginx", "-g", "daemon off;"]

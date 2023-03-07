@@ -1,0 +1,55 @@
+FROM php:7.4.33-fpm-alpine
+
+# add user
+RUN addgroup -S nginx \
+    && adduser -D -H -u 101 nginx -G nginx \
+    && addgroup nginx root
+
+# Install apk libraries
+RUN apk upgrade --update && apk --no-cache add \
+    libssh2-dev \
+    libmcrypt-dev \
+    libjpeg-turbo-dev \
+    libzip-dev \
+    libpng-dev \
+    libxml2-dev \
+    autoconf \
+    gcc \
+    make \
+    g++ \
+    zlib-dev \
+    openssl \
+    openssh \
+    bash \
+    jq
+
+# Install PHP extensions
+RUN docker-php-ext-install \
+    gd \
+    mysqli \
+    opcache \
+    pdo \
+    pdo_mysql \
+    soap \
+    zip
+
+# Enable PHP extensions
+RUN pecl install mcrypt \
+    && docker-php-ext-enable mcrypt
+
+# Install composer 2.5.2
+RUN curl -sS https://getcomposer.org/download/2.5.2/composer.phar > /usr/local/bin/composer \
+    && chmod +x /usr/local/bin/composer
+
+# Clean up
+RUN rm -rf /var/cache/apk/*
+
+# unix socket
+RUN mkdir /var/run/php-fpm \
+    && chown nginx:nginx /var/run/php-fpm
+VOLUME ["/var/run/php-fpm"]
+
+# Setup php log directory
+RUN mkdir -p /var/log/php-fpm \
+    && mkdir -p /var/log/tflashgame \
+    && chmod -R 775 /var/log

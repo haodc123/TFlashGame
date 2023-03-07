@@ -1,0 +1,62 @@
+version: '3.6'
+services:
+  tflashgame_nginx:
+    container_name: tflashgame_nginx
+    build:
+      context: .
+      dockerfile: ./Dockerfile_nginx
+    ports:
+      - "8080:80"
+    tty: true
+    volumes:
+      - php_socket:/var/run/php-fpm
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./laravel:/var/www/tflashgame/release
+    working_dir: /var/www/tflashgame/release
+    networks:
+      - tflashgame
+  tflashgame_php:
+    container_name: tflashgame_php
+    build:
+      context: .
+      dockerfile: ./Dockerfile_php
+    tty: true
+    environment:
+      APP_ENV: localhost
+    volumes:
+      - php_socket:/var/run/php-fpm
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+      - ./php/php-fpm.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ./laravel:/var/www/tflashgame/release
+      - vendor:/var/www/tflashgame/release/vendor
+    working_dir: /var/www/tflashgame/release
+    networks:
+      - tflashgame
+  ssh_tunnel:
+    container_name: ssh_tunnel
+    build:
+      context: .
+      dockerfile: Dockerfile_ssh_tunnel
+    image: kingsquare/tunnel
+    platform: linux/amd64
+    volumes:
+      - /ssh-agent:/ssh-agent
+      - ${HOME}/.aws/credentials:/root/.aws/credentials:rw
+      - ${HOME}/.aws/config:/root/.aws/config:rw
+    environment:
+      SSH_AUTH_SOCK: /ssh-agent
+      AWS_DEFAULT_REGION: ap-southeast-1
+      AWS_PROFILE: tflashgame
+    command: "*:3306:development-tflashgame.cluster-chejhegvogu7.ap-southeast-1.rds.amazonaws.com:3306 dev-tflashgame-bastion"
+    networks:
+      tflashgame:
+        aliases:
+          - development-tflashgame.cluster-chejhegvogu7.ap-southeast-1.rds.amazonaws.com
+
+volumes:
+  vendor:
+  php_socket:
+
+networks:
+  tflashgame:
+    name: tflashgame

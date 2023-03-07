@@ -1,0 +1,33 @@
+ARG BASE_IMAGE_TAG=base-php-v1.0.1
+
+FROM 376206943201.dkr.ecr.ap-southeast-1.amazonaws.com/tflashgame:${BASE_IMAGE_TAG}
+
+ENV PATH $PATH:/var/www/tflashgame/release/vendor/bin/
+ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV TZ Asia/Singapore
+
+# Set PHP and php-fpm configs
+COPY ./php/php.ini /usr/local/etc/php/php.ini
+COPY ./php/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+RUN rm -rf /usr/local/etc/php-fpm.d/zz-docker.conf /usr/local/etc/php-fpm.d/docker.conf
+
+# Set fluent-bit config
+COPY ./fluent-bit/fluent-bit.conf /fluent-bit/extra/fluent-bit.conf
+VOLUME ["/fluent-bit/extra"]
+
+# Copy Laravel app file and autoload setting
+WORKDIR /var/www/tflashgame/release
+COPY ./laravel/ /var/www/tflashgame/release
+VOLUME ["/var/www/tflashgame/release/public"]
+RUN chmod -R 777 /var/www/tflashgame/release
+
+# Install dependencies
+COPY ./laravel/composer.json /tmp/composer.json
+RUN composer install --optimize-autoloader --no-dev --prefer-dist
+
+# Add Entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["php-fpm"]

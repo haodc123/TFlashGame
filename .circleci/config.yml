@@ -1,35 +1,285 @@
 version: 2.1
 
-jobs:
-  build_and_test:
+refs:
+  docker_account_info: &docker_account_info
+    auth:
+      username: $DOCKER_HUB_USERNAME
+      password: $DOCKER_HUB_PULL_ACCESS_TOKEN
+  parameter_oidc: &parameter_oidc
+    profile-name:
+      description: Profile name for web identity role assumption
+      type: string
+      default: default
+    role-arn:
+      description: |
+        The Amazon Resource Name (ARN) of the role that the caller is assuming.
+        Role ARN must be configured for web identity.
+      type: string
+      default: arn:aws:iam::376206943201:role/circleci
+    role-session-name:
+      description: An identifier for the assumed role session
+      type: string
+      default: circleci-oidc
+    session-duration:
+      description: The duration of the session in seconds
+      type: string
+      default: "3600"
+
+orbs:
+  docker: circleci/docker@2.2.0
+  aws-cli: circleci/aws-cli@3.1.4
+
+executors:
+  deploy:
+    working_directory: ~/project/tflashgame
     docker:
-      - image: framgia/laravel-workspace
+      - image: cimg/base:2023.01
+        <<: *docker_account_info
+    environment:
+      AWS_DEFAULT_REGION: ap-southeast-1
+      ECR_BASE_URI: 376206943201.dkr.ecr.ap-southeast-1.amazonaws.com
+      APP_NAME: tflashgame
+
+commands:
+  setup-docker:
+    description: "Setup Docker settings."
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: false
+          version: 20.10.18
+      - docker/install-docker-credential-helper
+
+  build-and-push-image-ecr:
+    description: "Build Docker image and push it to ECR."
+    parameters:
+      docker_file_path:
+        description: The Dockerfile path
+        type: string
+        default: ./Dockerfile
+      image_name:
+        description: The Docker image name
+        type: string
+        default: tflashgame
+      image_tag:
+        description: The Docker image tag to add
+        type: string
+      build_arg:
+        description: variable that users can pass at build-time
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: Build Docker image and push it to ECR.
+          command: |
+            ECR_URI=${ECR_BASE_URI}/<< parameters.image_name >>
+            check=$(aws ecr list-images \
+              --repository-name << parameters.image_name >> \
+              --query "imageIds[*].imageTag" \
+              | jq '.[] | select(contains("'<< parameters.image_tag >>'"))')
+
+            if [ -z "${check}" ]; then
+              if [ "<< parameters.build_arg >>" != "" ]; then
+                build_arg="--build-arg << parameters.build_arg >>"
+              else
+                build_arg=""
+              fi
+
+
+              aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_BASE_URI}
+              echo "Build << parameters.image_name >> image from << parameters.docker_file_path >>."
+              docker build \
+                ${build_arg} \
+                -t ${ECR_URI}:<< parameters.image_tag >> \
+                -f << parameters.docker_file_path >> .
+              docker push -a ${ECR_URI}
+              echo "${ECR_URI}:<< parameters.image_tag >> was pushed to ECR successfully."
+            else
+              echo "${ECR_URI}:<< parameters.image_tag >> has already existed in ECR."
+            fi
+
+  create-nginx-checksum:
+    description: "Create Checksum from Application files"
+    steps:
+      - run:
+          name: Create Checksum Nginx
+          command: |
+            SEED=/tmp/checksum-seed
+            find ./nginx -type f -exec sha256sum {} \; | sort -k 2 > $SEED
+            find ./Dockerfile_nginx -type f -exec sha256sum {} \; | sort -k 2 >> $SEED
+            NGINX_CHECKSUM=$(cat $SEED | sha256sum | awk '{ print $1 }')
+            echo "export NGINX_CHECKSUM=${NGINX_CHECKSUM}" >> $BASH_ENV
+
+  create-app-checksum:
+    description: "Create Checksum from Application files"
+    steps:
+      - run:
+          name: Create Checksum Application
+          command: |
+            SEED=/tmp/checksum-seed
+            find ./web -type f -exec sha256sum {} \; | sort -k 2 > $SEED
+            find ./php -type f -exec sha256sum {} \; | sort -k 2 >> $SEED
+            find ./Base.Dockerfile_php -type f -exec sha256sum {} \; | sort -k 2 >> $SEED
+            find ./Dockerfile_php -type f -exec sha256sum {} \; | sort -k 2 >> $SEED
+            find ./entrypoint.sh -type f -exec sha256sum {} \; | sort -k 2 >> $SEED
+            APP_CHECKSUM=$(cat $SEED | sha256sum | awk '{ print $1 }')
+            echo "export APP_CHECKSUM=${APP_CHECKSUM}" >> $BASH_ENV
+
+jobs:
+  build-base-image:
+    executor:
+      name: deploy
+    parameters:
+      <<: *parameter_oidc
     steps:
       - checkout
-      - run: cp web/.env.example web/.env
-
-      # composer cache
-      - restore_cache:
-          keys:
-            - vendor-v1-{{ checksum "composer.lock" }}
-      - run:  
-          name: Install composer
-          command: |
-            cd web
-            composer install
-      - save_cache:
-          key: vendor-v1-{{ checksum "composer.lock" }}
+      - setup-docker
+      - aws-cli/install
+      - aws-cli/assume-role-with-web-identity:
+          role-arn: << parameters.role-arn >>
+          role-session-name: << parameters.role-session-name >>
+      # Build Application Base Image
+      - build-and-push-image-ecr:
+          image_tag: base-php-v1.0.1
+          image_name: tflashgame
+          docker_file_path: ./Base.Dockerfile_php
+      - persist_to_workspace:
+          root: ~/project
           paths:
-            - vendor
-      # run test
-      - run: phpcs --standard=Framgia app
+            - tflashgame
+
+  build-image:
+    executor:
+      name: deploy
+    parameters:
+      <<: *parameter_oidc
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - setup-docker
+      - aws-cli/install
+      - aws-cli/assume-role-with-web-identity:
+          role-arn: << parameters.role-arn >>
+          role-session-name: << parameters.role-session-name >>
+      - create-nginx-checksum
+      - create-app-checksum
+      # Build Nginx Image
+      - build-and-push-image-ecr:
+          image_tag: nginx-${NGINX_CHECKSUM}
+          image_name: tflashgame
+          docker_file_path: ./Dockerfile_nginx
+      # Build Application Image
+      - build-and-push-image-ecr:
+          image_tag: php-${APP_CHECKSUM}
+          image_name: tflashgame
+          docker_file_path: ./Dockerfile_php
+          build_arg: BASE_IMAGE_TAG=base-php-v1.0.1
+
+  # deploy-using-ecspresso:
+  #   executor:
+  #     name: deploy
+  #   parameters:
+  #     env:
+  #       description: |
+  #         Specify one of "development", "staging", or "production" as the environment name.
+  #         (default: "development")
+  #       type: enum
+  #       enum: [development, staging, production]
+  #       default: development
+  #     <<: *parameter_oidc
+  #   steps:
+  #     - attach_workspace:
+  #         at: ~/project
+  #     - aws-cli/install
+  #     - aws-cli/assume-role-with-web-identity:
+  #         role-arn: << parameters.role-arn >>
+  #         role-session-name: << parameters.role-session-name >>
+  #     - create-nginx-checksum
+  #     - create-app-checksum
+  #     - ecspresso/install
+  #     - run:
+  #         name: Setup environment variables
+  #         command: |
+  #           echo "export ENV=<< parameters.env >>" >> $BASH_ENV
+  #           echo "export NGINX_DOCKER_TAG=${NGINX_CHECKSUM}" >> $BASH_ENV
+  #           echo "export APP_DOCKER_TAG=${APP_CHECKSUM}" >> $BASH_ENV
+  #     - run:
+  #         name: Deploy ECS Task
+  #         working_directory: ./ecspresso
+  #         command: |
+  #           check=$(ecspresso diff --config=./ecspresso.yaml)
+
+  #           echo "Starting deploy to ${ENV} environment using ecspresso"
+
+  #           if [ -n "${check}" ]; then
+  #             echo "Register ECS Task Definition..."
+  #             echo " --- Register ecs-task-def.json file --- "
+  #             echo ${check}
+  #             ecspresso register --config=./ecspresso.yaml
+  #             echo "Completed."
+  #           else
+  #             echo "This ECS Task Definition has already existed."
+  #           fi
+
+  #           echo "Update service ..."
+  #           ecspresso deploy --config=./ecspresso.yaml --latest-task-definition
+  #           echo "Finished update service for ${ENV}-${APP_NAME}!"
 
 workflows:
   build-and-deploy:
     jobs:
-      - build_and_test:
+      - build-base-image:
           context:
             - docker-hub-pull-creds
           filters:
             branches:
               only: /develop|staging|master/
+      # development
+      - build-image:
+          name: build-image-development
+          requires:
+            - build-base-image
+          context:
+            - docker-hub-pull-creds
+          filters:
+            branches:
+              only: develop
+      # - deploy-using-ecspresso:
+      #     name: deploy-using-ecspresso-development
+      #     env: development
+      #     requires:
+      #       - build-image-development
+      #     context:
+      #       - docker-hub-pull-creds
+      #     filters:
+      #       branches:
+      #         only: develop
+      
+      # production
+      - build-image:
+          name: build-image-production
+          requires:
+            - build-base-image
+          context:
+            - docker-hub-pull-creds
+          filters:
+            branches:
+              only: master
+      # - approve:
+      #     name: approve-production
+      #     requires:
+      #       - build-image-production
+      #     filters:
+      #       branches:
+      #         only: master
+      #     type: approval
+      # - deploy-using-ecspresso:
+      #     name: deploy-using-ecspresso-production
+      #     env: production
+      #     requires:
+      #       - approve-production
+      #       - build-image-production
+      #     context:
+      #       - docker-hub-pull-creds
+      #     filters:
+      #       branches:
+      #         only: master

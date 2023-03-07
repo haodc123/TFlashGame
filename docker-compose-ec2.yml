@@ -1,0 +1,42 @@
+version: '3.6'
+services:
+  tflashgame_nginx:
+    container_name: tflashgame_nginx
+    build:
+      context: .
+      dockerfile: ./Dockerfile_nginx
+    ports:
+      - "80:80"
+    tty: true
+    volumes:
+      - php_socket:/var/run/php-fpm
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./laravel:/var/www/tflashgame/release
+    working_dir: /var/www/tflashgame/release
+    networks:
+      - tflashgame
+  tflashgame_php:
+    container_name: tflashgame_php
+    build:
+      context: .
+      dockerfile: ./Dockerfile_php
+    tty: true
+    env_file:
+      - ec2.env
+    volumes:
+      - php_socket:/var/run/php-fpm
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+      - ./php/php-fpm.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ./laravel:/var/www/tflashgame/release
+      - vendor:/var/www/tflashgame/release/vendor
+    working_dir: /var/www/tflashgame/release
+    networks:
+      - tflashgame
+
+volumes:
+  vendor:
+  php_socket:
+
+networks:
+  tflashgame:
+    name: tflashgame
