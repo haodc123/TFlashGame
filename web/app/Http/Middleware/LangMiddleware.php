@@ -11,7 +11,7 @@ class LangMiddleware
         $url_array = explode('.', parse_url($request->url(), PHP_URL_HOST));
         $subdomain = $url_array[0];
 
-        $languages = ['en', 'vi'];
+        $languages = ['en', 'vi', 'id'];
 
         if (in_array($subdomain, $languages)) {
             App::setLocale($subdomain);

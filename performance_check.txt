@@ -1,0 +1,7 @@
+Local: SQL from DebugBar
+
+EN: http://localhost:8000/game/bomber-friends
+108 ms
+
+VI: http://vi.localhost:8000/game/bomber-friends
+125ms

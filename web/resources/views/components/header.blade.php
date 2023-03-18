@@ -45,6 +45,7 @@
                     <li>
                         <a href="{{ Config::get('constants.link.schema') }}{{ Config::get('constants.link.site_no_lang') }}">EN /</a>
                         <a href="{{ Config::get('constants.link.schema') }}vi.{{ Config::get('constants.link.site_no_lang') }}">VI</a>
+                        <a href="{{ Config::get('constants.link.schema') }}id.{{ Config::get('constants.link.site_no_lang') }}">INDO</a>
                     </li>
                     <li>
                         @if (Auth::check())

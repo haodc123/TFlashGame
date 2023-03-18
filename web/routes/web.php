@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['middleware' => 'lang'], function() {
-    Route::get('change-language/{language}', 'HomeController@changeLanguage')->name('changeLanguage');    
+    // Route::get('change-language/{language}', 'HomeController@changeLanguage')->name('changeLanguage');    
 
     Route::get('/', 'HomeController@index')->name('home');
     Route::get('home', function() {
