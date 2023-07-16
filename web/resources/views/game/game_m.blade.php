@@ -25,27 +25,55 @@
 			html, body {
 				height: 100%;
 				margin: 0;
+				position: relative;
 			}
 			#iframe-wrapper {
+				/* position: absolute;
+				top: 15px; */
 				padding-top: 15px !important;
 				min-height: 100%;
 				min-width: 100%;
 				height: 100% !important;
+				z-index: 1;
 			}
 			#iframe-wrapper-landscape {
+				/* position: absolute;
+				top: 15px; */
 				padding-top: 15px !important;
 				min-height: 100%;
 				min-width: 100%;
 				height: 100% !important;
+				z-index: 1;
 			}
 			#ifr_play_game_m {
 				width: 100% !important;
 				height: 100% !important;
 			}
+			.hide-overlay {
+				width: 55px;
+				height: 50px;
+				position: absolute;
+				top: 48px;
+				right: 0px;
+				background-color: #000000;
+				z-index: 1000;
+			}
+			.hidden {
+				display: none;
+			}
     	</style>
 		
     </head>
     <body onload="openFullscreen">
+	@php
+		$hide_class = '';
+		if (in_array($g->g_title_slug, array('nations-league-soccer')))
+			$hide_class = 'hide-overlay';
+		else
+			$hide_class = 'hidden';	
+	@endphp
+		<div class="{{ $hide_class }}">
+		</div>
 
 	@if ($g->g_dimension == 0)
 		<div id="iframe-wrapper-landscape"><iframe id="ifr_play_game_m" seamless="true" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true" webkit-playsinline="true" frameborder="0" scrolling="no" src="{{ $g->g_link }}"></iframe></div>	
