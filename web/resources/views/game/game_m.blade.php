@@ -62,6 +62,11 @@
 				display: none;
 			}
     	</style>
+
+		<!-- PWA -->
+		<meta name="theme-color" content="#6777ef"/>
+        <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
+        <link rel="manifest" href="{{ asset('/manifest.json') }}">
 		
     </head>
     <body onload="openFullscreen">
@@ -81,6 +86,15 @@
 		<div id="iframe-wrapper"><iframe id="ifr_play_game_m" seamless="true" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true" webkit-playsinline="true" frameborder="0" scrolling="no" src="{{ $g->g_link }}"></iframe></div>
 	@endif	
 		<!-- <img src="../images/icons/ic-player.png" id="btn_play_game" onclick="openFullscreen('{{ getOrientationMode($g->g_dimension) }}');" /> -->
+
+		<script src="{{ asset('/sw.js') }}"></script>
+		<script>
+			if (!navigator.serviceWorker.controller) {
+				navigator.serviceWorker.register("/sw.js").then(function (reg) {
+					console.log("Service worker has been registered for scope: " + reg.scope);
+				});
+			}
+		</script>
 
 	</body>
 	
