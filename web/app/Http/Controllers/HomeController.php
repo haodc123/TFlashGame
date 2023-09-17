@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Game;
 use App\GameCats;
+use App\Blogs;
+use App\BlogCats;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -13,6 +15,8 @@ class HomeController extends Controller
 
         $g = new Game();
         $gc = new GameCats();
+        $blogs = new Blogs();
+        $someblogs = $blogs->getSomeBlogs(8);
         $g_new = $g->getNewGames(24);
         $g_hot = $g->getHotGames(48); // 8 Special
 
@@ -25,6 +29,7 @@ class HomeController extends Controller
 
         // print_r($gc_by_id);
         return view('home.home', [
+            'someblogs' => $someblogs,
             'g_new' => $g_new,
             'g_hot' => $g_hot,
             'gbc_1' => $gbc_1,
