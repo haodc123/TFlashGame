@@ -23,6 +23,8 @@ Route::group(['middleware' => 'lang'], function() {
     Route::get('/test', function() {
         return view('game.game_t');
     })->name('test');
+    Route::get('blogs', 'BlogsController@index')->name('blogs.list');
+    Route::get('blogs/{title}', 'BlogsController@show')->name('blogs.show');
     Route::get('game/{slug}', 'GameController@game')->name('game');
     Route::get('game_m/{slug}', 'GameController@game_m')->name('game_m');
     Route::get('game_s/{slug}', 'GameController@game_s')->name('game_s');
