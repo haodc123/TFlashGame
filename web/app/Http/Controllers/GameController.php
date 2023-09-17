@@ -6,6 +6,7 @@ use App\Game;
 use App\GameCats;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Redirect;
 
 class GameController extends Controller
 {
@@ -66,6 +67,18 @@ class GameController extends Controller
 
             return 'No game found!';
         }
+    }
+
+    public function game_s($slug) {
+
+		switch($slug) {
+            case 'jigsaw':
+                return Redirect::to('https://html5.gamemonetize.co/v95qvv7p3cpa1duqnyvzvaqvmxv0wawr/');
+                break;
+            default:
+                return Redirect::to('https://en.tflash.online');
+        }
+
     }
     
     public function hot() {
