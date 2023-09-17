@@ -64,6 +64,7 @@
 			
 			<!-- Main -->
 			<div id="main">
+
 				<section id="hot" class="wrapper ">
 					<div class="inner">
 						<div class="wrap_search">
@@ -227,6 +228,37 @@
 								</ul>
 							</div>
 					</div>
+				</section>
+
+				<section id="s-blogs" class="wrapper ">
+				<div class="inner">
+
+					<header class="align-center">
+						<h2>Thông tin hữu ích</h2>
+					</header>
+
+					<!-- 4 Column Video Section -->
+						<div class="flex flex-3">
+						@foreach ($someblogs as $blog)
+							<div class="video col">
+
+								<div class="image fit">
+									<img src="images/blogs/{{ $blog->blog_thumb }}" alt="Dịch vụ Media, Ảnh - {{ $blog->blog_title }}" />
+								</div>
+
+								<p class="caption">
+									{{ $blog->blog_title }}
+								</p>
+
+								<a href="blogs/{{ $blog->blog_title_slug }}" class="link"><span>Click Me</span></a>
+
+							</div>
+						@endforeach
+						</div>
+
+						<a href="blogs/" class="link-more">See more</a>
+				</div>
+				<div class="clear"></div>
 				</section>
 
 			</div>

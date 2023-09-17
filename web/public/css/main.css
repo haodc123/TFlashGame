@@ -4435,3 +4435,46 @@ span.kw {
 	font-weight: 600;
 	background-color: rgba(255, 255, 255, 0.075);
 }
+
+/* Blog */
+#s-blogs .flex.flex-3 .col {
+	width: 22%;
+	margin: 10px
+}
+#s-blogs .video .image {
+	margin-bottom: 10px;
+}
+.wrapper.nonbg::before {
+	background-image: none !important;
+}
+.blog-content {
+	padding-left: 120px;
+	padding-right: 200px;
+}
+.detail-content {
+	font-size: 16px;
+}
+@media screen and (max-width: 980px) {
+	.blog-detail {
+		margin-left: -10px !important;
+	}
+	.blog-detail .row > * {
+		padding-left: 0px !important;
+	}
+	.blog-content {
+		padding-left: 100px;
+		padding-right: 100px;
+	}
+}
+@media screen and (max-width: 736px) {
+	.blog-content {
+		padding-left: 80px;
+		padding-right: 80px;
+	}
+}
+@media screen and (max-width: 425px) {
+	.blog-content {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+}
