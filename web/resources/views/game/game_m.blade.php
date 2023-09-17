@@ -30,13 +30,19 @@
 			#iframe-wrapper {
 				/* position: absolute;
 				top: 15px; */
-				padding-top: 15px !important;
+				/* padding-top: 15px !important; */
 				min-height: 100%;
 				min-width: 100%;
 				height: 100% !important;
 				z-index: 1;
 			}
 			#iframe-wrapper-landscape {
+				min-height: 100%;
+				min-width: 100%;
+				height: 100% !important;
+				z-index: 1;
+			}
+			#iframe-wrapper-landscape-banner-top {
 				/* position: absolute;
 				top: 15px; */
 				padding-top: 15px !important;
@@ -81,7 +87,11 @@
 		</div>
 
 	@if ($g->g_dimension == 0)
-		<div id="iframe-wrapper-landscape"><iframe id="ifr_play_game_m" seamless="true" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true" webkit-playsinline="true" frameborder="0" scrolling="no" src="{{ $g->g_link }}"></iframe></div>	
+	    @if ($g->g_ads == 1)
+		<div id="iframe-wrapper-landscape-banner-top"><iframe id="ifr_play_game_m" seamless="true" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true" webkit-playsinline="true" frameborder="0" scrolling="no" src="{{ $g->g_link }}"></iframe></div>
+		@elseif ($g->g_ads == 0)
+		<div id="iframe-wrapper-landscape"><iframe id="ifr_play_game_m" seamless="true" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true" webkit-playsinline="true" frameborder="0" scrolling="no" src="{{ $g->g_link }}"></iframe></div>
+		@endif
 	@else
 		<div id="iframe-wrapper"><iframe id="ifr_play_game_m" seamless="true" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true" webkit-playsinline="true" frameborder="0" scrolling="no" src="{{ $g->g_link }}"></iframe></div>
 	@endif	

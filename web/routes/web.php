@@ -20,8 +20,12 @@ Route::group(['middleware' => 'lang'], function() {
     Route::get('home', function() {
         return redirect()->route('home');
     });
+    Route::get('/test', function() {
+        return view('game.game_t');
+    })->name('test');
     Route::get('game/{slug}', 'GameController@game')->name('game');
     Route::get('game_m/{slug}', 'GameController@game_m')->name('game_m');
+    Route::get('game_s/{slug}', 'GameController@game_s')->name('game_s');
     Route::get('cat/{slug}', 'CatController@gamesbycat')->name('gamesbycat');
     Route::get('cat', 'CatController@allcat')->name('allcat');
     Route::get('hot', 'GameController@hot')->name('hot');
